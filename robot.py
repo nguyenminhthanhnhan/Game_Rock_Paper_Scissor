@@ -19,7 +19,7 @@ cap.set(3, 640)
 cap.set(4, 480)
 
 # Load model
-model = load_model("robot_model1.h5")
+model = load_model("model/robot_model1.h5")
 
 timer = 4 #time to coutdown
 stateResult = False 
@@ -130,6 +130,53 @@ audio_Stie = [
     "Audio/result_rounds/tie/scissor_tie/scissor_tie2.mp3",
     "Audio/result_rounds/tie/scissor_tie/scissor_tie3.mp3"
 ]
+# audio for current round
+audio_thirdR_of_Three = [
+    "Audio/select_turns/round_of_total/three_rounds/third_round/win_1round/win_1round1.mp3",
+    "Audio/select_turns/round_of_total/three_rounds/third_round/win_1round/win_1round2.mp3"
+]
+audio_TFround_of_Five_lose = [
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/lose/lose1.mp3",
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/lose/lose2.mp3",
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/lose/lose3.mp3"
+]
+audio_TFround_of_Five_win = [
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/win/win1.mp3",
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/win/win2.mp3",
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/win/win3.mp3"
+]
+audio_TFround_of_Five_tie = [
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/tie/tie1.mp3",
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/tie/tie2.mp3",
+    "Audio/select_turns/round_of_total/five_rounds/third_fouth/tie/tie3.mp3"
+]
+audio_FFSrounds_of_Seven_lose = [
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/lose/lose1.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/lose/lose2.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/lose/lose3.mp3"
+]
+audio_FFSrounds_of_Seven_win = [
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/win/win1.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/win/win2.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/win/win3.mp3"
+]
+audio_FFSrounds_of_Seven_tie = [
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/tie/tie1.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/tie/tie2.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/fouth_fiveth_sixth/tie/tie3.mp3"
+]
+audio_Frounds_of_Seven_lose = [
+    "Audio/select_turns/round_of_total/seven_rounds/final/lose/lose1.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/final/lose/lose2.mp3"
+]
+audio_Frounds_of_Seven_win = [
+    "Audio/select_turns/round_of_total/seven_rounds/final/win/win1.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/final/win/win2.mp3"
+]
+audio_Frounds_of_Seven_tie = [
+    "Audio/select_turns/round_of_total/seven_rounds/final/tie/tie1.mp3",
+    "Audio/select_turns/round_of_total/seven_rounds/final/tie/tie2.mp3"
+]
 # Information of Robot hand 
 hc05_mac_address = "98:DA:60:0A:13:25"
 gestures = {"scissors": "0*1*1*0*0#", "rock": "0*0*0*0*0#", "paper": "1*1*1*1*1#"}
@@ -185,13 +232,14 @@ def calculate_winner(user_move, robot_move):
 
 # Reset the game if play again
 def reset_game():
-    global current_round, scores, startGame, stateResult, selected_round_limit, tie
+    global current_round, scores, startGame, stateResult, selected_round_limit, tie, prev_move
     current_round = 0
     scores = [0, 0]
     tie = 0
     startGame = False  # Ensure the game state is reset
     stateResult = False  # Ensure the result state is reset
     selected_round_limit = None  # Reset the selected round limit
+    prev_move = None
 
 # The button to play again 
 play_again_button = (34, 711, 171, 57)
@@ -234,13 +282,19 @@ def mouse_callback(event, x, y, flags, param):
                 random_audio = choice(seven_turns_audio)  # Choose 1 in 3 audio files
                 play_sound(random_audio)  # Use the new play_sound function
                 print("Selected 7 turns")
-
+                
+BUTTON_COLOR = (100, 150, 255)  # Blue for 3 Turns button
 # Display the rounds of game: three choices
 def display_turn_selection(imgBG):
+    # Draw background rectangles for each button
+    cv2.rectangle(imgBG, (550, 160), (670, 210), BUTTON_COLOR, -1)  # Background for "3 Turns"
+    cv2.rectangle(imgBG, (750, 160), (870, 210), BUTTON_COLOR, -1)  # Background for "5 Turns"
+    cv2.rectangle(imgBG, (950, 160), (1070, 210), BUTTON_COLOR, -1) # Background for "7 Turns"
+
     cv2.putText(imgBG, "Select Number of Turns:", (70, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
-    cv2.putText(imgBG, "3 Turns", (570, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
-    cv2.putText(imgBG, "5 Turns", (770, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
-    cv2.putText(imgBG, "7 Turns", (970, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
+    cv2.putText(imgBG, "3 Turns", (550, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
+    cv2.putText(imgBG, "5 Turns", (750, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
+    cv2.putText(imgBG, "7 Turns", (950, 195), FONT, FONT_SCALE, FONT_COLOR, FONT_THICKNESS)
 
 cv2.namedWindow("BG")
 cv2.setMouseCallback("BG", mouse_callback)
@@ -275,15 +329,10 @@ while True:
             cv2.putText(imgBG, f"Final Score: You {scores[1]} - {scores[0]} Robot", (200, 450), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 3)
             cv2.imshow("BG", imgBG)
 
-            start_time = time.time()
-            # Wait for up to 5 seconds or until a key is pressed
             while True:
                 key = cv2.waitKey(1)
                 if key != -1:  # If any key is pressed, break the loop
                     break
-                if time.time() - start_time > 10:  # Check if 5 seconds have passed
-                    print("Exiting due to timeout.")
-                    exit()  # Exit the program if timeout occurs
 
     success, img = cap.read()
     rgb_frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -358,6 +407,15 @@ while True:
                         imgRB = cv2.cvtColor(imgRB, cv2.COLOR_BGR2BGRA)
                     imgBG = cvzone.overlayPNG(imgBG, imgRB, (72, 350))
                     prev_move = user_move_name
+                else:
+                    pygame.mixer.music.load("Audio/repeat/repeat.mp3")
+                    pygame.mixer.music.play()
+                    if winner == "You win":
+                        scores[1] += 1
+                    elif winner == 'Robot wins':
+                        scores[0] += 1
+                    else:
+                        tie += 1
 
     imgScaled = cv2.resize(img, (311, 396))
     imgBG[304:700, 704:1015] = imgScaled
@@ -381,16 +439,117 @@ while True:
             current_round += 1
             print(f"Round {current_round}/{selected_round_limit}")
             stateResult = False
-            # timer = 0
             startGame = False  # Reset the game state for the new round
-            # initialTime = time.time()  # Start new round timer
-
+            if selected_round_limit == 3:
+                if current_round == 1:
+                    pygame.mixer.music.load("Audio/select_turns/round_of_total/three_rounds/first_round/first_round.mp3")
+                    pygame.mixer.music.play()
+                elif current_round == 2:
+                    if scores[1] == 1:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/three_rounds/second_round/win_round1/win_round1.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[1] == 0 and scores[0] == 1:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/three_rounds/second_round/lose_round1/lose_round1.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[1] == scores[0]:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/three_rounds/second_round/tie_round1/tie_round1.mp3")
+                        pygame.mixer.music.play()
+                elif current_round == 3:
+                    if scores[1] == 0:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/three_rounds/third_round/win_0round/win_0round.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[1] == 1:
+                        random_audio = choice(audio_thirdR_of_Three)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    elif scores[1] == 2:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/three_rounds/third_round/win_2round/win_2round.mp3")
+                        pygame.mixer.music.play()
+            elif selected_round_limit == 5:
+                if current_round == 1:
+                    pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/first/first.mp3")
+                    pygame.mixer.music.play()
+                elif current_round == 2:
+                    if scores[1] == 1:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/second/win/win.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[0] == 1:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/second/lose/lose.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[1] == scores[0]:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/second/tie/tie.mp3")
+                        pygame.mixer.music.play()
+                elif (current_round == 3) or (current_round == 4):
+                    if scores[1] > scores[0]:
+                        random_audio = choice(audio_TFround_of_Five_win)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    elif scores[1] < scores[0]:
+                        random_audio = choice(audio_TFround_of_Five_lose)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    else:
+                        random_audio = choice(audio_TFround_of_Five_tie)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                elif current_round == 5:
+                        if scores[1] > scores[0]:
+                            pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/final/win/win.mp3")
+                            pygame.mixer.music.play()
+                        elif scores[1] < scores[0]:
+                            pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/final/lose/lose.mp3")
+                            pygame.mixer.music.play()
+                        else:
+                            pygame.mixer.music.load("Audio/select_turns/round_of_total/five_rounds/final/tie/tie.mp3")
+                            pygame.mixer.music.play()
+            elif selected_round_limit == 7:
+                if current_round == 1:
+                    pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/first/first.mp3")
+                    pygame.mixer.music.play()
+                elif current_round == 2:
+                    if scores[1] == 1:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/second/win/win.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[0] == 1:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/second/lose/lose.mp3")
+                        pygame.mixer.music.play()
+                    else:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/second/tie/tie.mp3")
+                        pygame.mixer.music.play()
+                elif current_round == 3:
+                    if scores[1] > scores[0]:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/third/win/win.mp3")
+                        pygame.mixer.music.play()
+                    elif scores[1] < scores[0]:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/third/lose/lose.mp3")
+                        pygame.mixer.music.play()
+                    else:
+                        pygame.mixer.music.load("Audio/select_turns/round_of_total/seven_rounds/third/tie/tie.mp3")
+                        pygame.mixer.music.play()
+                elif (current_round == 4) or (current_round == 5) or (current_round == 6):
+                    if scores[1] > scores[0]:
+                        random_audio = choice(audio_FFSrounds_of_Seven_win)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    elif scores[1] < scores[0]:
+                        random_audio = choice(audio_FFSrounds_of_Seven_lose)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    else:
+                        random_audio = choice(audio_FFSrounds_of_Seven_tie)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                elif current_round == 7:
+                    if scores[1] > scores[0]:
+                        random_audio = choice(audio_Frounds_of_Seven_win)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    elif scores[1] < scores[0]:
+                        random_audio = choice(audio_Frounds_of_Seven_lose)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
+                    else:
+                        random_audio = choice(audio_Frounds_of_Seven_tie)  # Choose 1 in 3 audio files
+                        play_sound(random_audio)
     # Press 's' to start the countdown
     if key == ord('s') and not stateResult and not startGame:  # Ensure startGame is False
         startGame = True
         initialTime = time.time()  # Start 3-second countdown for this round
         stateResult = False
         print("Starting countdown...")
+        pygame.mixer.music.load("Audio/select_turns/round_of_total/coutdown/coutdown.mp3")
+        pygame.mixer.music.play()
     
     if key == ord('q'): #Press 'q' to exit
         break
